@@ -1,0 +1,88 @@
+FUNCTION_BLOCK potenciaAire   // Block definition (there may be more than one block per file)
+
+// Define input variables
+VAR_INPUT                               
+        medida : REAL;
+        cantidadp : REAL;
+        temperatura : REAL;
+END_VAR
+
+// Define output variable
+VAR_OUTPUT                              
+        isa : REAL;
+END_VAR
+
+// Fuzzify input variable 'medida': {'pequena', 'mediana' , 'grande'}
+FUZZIFY medida                 
+        TERM pequena := (0, 1) (20, 0) ; 
+        TERM mediana := (15, 0) (25, 1) (35,0);
+        TERM grande := (30, 0) (40, 1);
+END_FUZZIFY
+
+// Fuzzify input variable 'cantidadp': {'pocas', 'algunas' , 'muchas'}
+FUZZIFY cantidadp         
+        TERM pocas := (0, 1) (4, 0) ; 
+        TERM algunas := (3, 0) (7, 1) (9,0);
+        TERM muchas:= (8, 0) (9, 1);
+END_FUZZIFY
+
+// Fuzzify input variable 'temperatura': {'frio', 'templado' , 'caliente'}
+FUZZIFY temperatura               
+        TERM frio := (0, 1) (20, 0) ; 
+        TERM templado := (18, 0) (23, 1) (28,0);
+        TERM caliente := (26, 0) (28, 1);
+END_FUZZIFY
+
+// Defzzzify output variable 'isa' : { 'bajo', 'medio', 'alto'}
+DEFUZZIFY isa                   
+        TERM bajo := (0, 0) (0.25, 1) (0.5, 0);
+        TERM medio := (0.25, 0) (0.5, 1) (0.75, 0);
+        TERM alto := (0.5, 0) (0.75, 1) (1,0);
+        METHOD : COG;           // Use 'Center Of Gravity' defuzzification method
+        DEFAULT := 0;           // Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+// Inference rules
+RULEBLOCK No1
+        AND : MIN;      // Use 'min' for 'and'
+        ACT : MIN;      // Use 'min' activation method
+        ACCU : MAX;     // Use 'max' accumulation method
+
+        RULE 1: IF cantidadp IS pocas AND medida IS pequena  AND temperatura IS caliente THEN isa IS alto;
+        RULE 2: IF cantidadp IS pocas AND medida IS pequena AND temperatura IS templado THEN isa IS bajo;
+        RULE 3: IF cantidadp IS pocas AND medida IS pequena AND temperatura IS frio THEN isa IS medio;
+
+        RULE 4: IF cantidadp IS pocas AND medida IS mediana  AND temperatura IS caliente THEN isa IS medio;
+        RULE 5: IF cantidadp IS pocas AND medida IS mediana AND temperatura IS templado THEN isa IS bajo;
+        RULE 6: IF cantidadp IS pocas AND medida IS mediana AND temperatura IS frio THEN isa IS alto;
+
+        RULE 25: IF cantidadp IS pocas AND medida IS grande  AND temperatura IS caliente THEN isa IS alto;
+        RULE 26: IF cantidadp IS pocas AND medida IS grande AND temperatura IS templado THEN isa IS bajo;
+        RULE 27: IF cantidadp IS pocas AND medida IS grande AND temperatura IS frio THEN isa IS alto;
+
+        RULE 1: IF cantidadp IS algunas AND medida IS pequena  AND temperatura IS caliente THEN isa IS alto;
+        RULE 2: IF cantidadp IS algunas AND medida IS pequena AND temperatura IS templado THEN isa IS medio;
+        RULE 3: IF cantidadp IS algunas AND medida IS pequena AND temperatura IS frio THEN isa IS medio;
+
+        RULE 4: IF cantidadp IS algunas AND medida IS mediana  AND temperatura IS caliente THEN isa IS medio;
+        RULE 5: IF cantidadp IS algunas AND medida IS mediana AND temperatura IS templado THEN isa IS medio;
+        RULE 6: IF cantidadp IS algunas AND medida IS mediana AND temperatura IS frio THEN isa IS medio;
+
+        RULE 25: IF cantidadp IS algunas AND medida IS grande  AND temperatura IS caliente THEN isa IS alto;
+        RULE 26: IF cantidadp IS algunas AND medida IS grande AND temperatura IS templado THEN isa IS alto;
+        RULE 27: IF cantidadp IS algunas AND medida IS grande AND temperatura IS frio THEN isa IS alto;
+
+        RULE 1: IF cantidadp IS muchas AND medida IS pequena  AND temperatura IS caliente THEN isa IS alto;
+        RULE 2: IF cantidadp IS muchas AND medida IS pequena AND temperatura IS templado THEN isa IS medio;
+        RULE 3: IF cantidadp IS muchas AND medida IS pequena AND temperatura IS frio THEN isa IS alto;
+
+        RULE 4: IF cantidadp IS muchas AND medida IS mediana  AND temperatura IS caliente THEN isa IS alto;
+        RULE 5: IF cantidadp IS muchas AND medida IS mediana AND temperatura IS templado THEN isa IS medio;
+        RULE 6: IF cantidadp IS muchas AND medida IS mediana AND temperatura IS frio THEN isa IS alto;
+
+        RULE 25: IF cantidadp IS muchas AND medida IS grande  AND temperatura IS caliente THEN isa IS medio;
+        RULE 26: IF cantidadp IS muchas AND medida IS grande AND temperatura IS templado THEN isa IS medio;
+        RULE 27: IF cantidadp IS muchas AND medida IS grande AND temperatura IS frio THEN isa IS medio;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
